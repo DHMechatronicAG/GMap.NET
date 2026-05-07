@@ -13,6 +13,11 @@ namespace GMap.NET.MapProviders
 {
     public abstract class OpenStreetMapProviderBase : GMapProvider, RoutingProvider, GeocodingProvider
     {
+        // OSM tile usage policy requires a descriptive User-Agent identifying the application.
+        // Using a browser-like User-Agent (e.g. Firefox) causes the server to block requests.
+        // See: https://operations.osmfoundation.org/policies/tiles/
+        public static string OsmUserAgent = "GMap.NET";
+
         public OpenStreetMapProviderBase()
         {
             MaxZoom = null;
@@ -20,6 +25,19 @@ namespace GMap.NET.MapProviders
             //only if one valid available. by providing http://www.openstreetmap.org/ a 418 error is given by the server.
             //RefererUrl = "http://www.openstreetmap.org/";
             Copyright = string.Format("© OpenStreetMap - Map data ©{0} OpenStreetMap", DateTime.Today.Year);
+        }
+
+        protected override void InitializeWebRequest(WebRequest request)
+        {
+            base.InitializeWebRequest(request);
+            if (request is System.Net.HttpWebRequest r)
+            {
+                r.UserAgent = OsmUserAgent;
+            }
+            else if (!string.IsNullOrEmpty(OsmUserAgent))
+            {
+                request.Headers["User-Agent"] = OsmUserAgent;
+            }
         }
 
         public readonly string ServerLetters = "abc";
