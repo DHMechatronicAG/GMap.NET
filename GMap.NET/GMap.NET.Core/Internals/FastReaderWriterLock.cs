@@ -54,10 +54,11 @@ namespace GMap.NET.Internals
         }
 
 #if UseFastResourceLock
-        ~FastReaderWriterLock()
-        {
-            Dispose(false);
-        }
+        // All locks are explicitly disposed, we don't want them to pre-dispose and then cause a NRE when they are actually disposed.
+        //~FastReaderWriterLock()
+        //{
+        //    Dispose(false);
+        //}
 
         void Dispose(bool disposing)
         {
